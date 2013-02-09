@@ -2,6 +2,8 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.api import urlfetch
 from google.appengine.ext.webapp import template
+from google.appengine.api import memcache
+
 from django.utils import simplejson as json
 import os
 import random
@@ -40,24 +42,31 @@ class MainPage(webapp.RequestHandler):
         else:
             zipCode = "90024"
 
-        itemDicts = []
 
-        # Compile items
-        for q in queryStrings:
-            requestURL = 'http://api.smartpea.com/api/deal/?title=' + q +  '&zip=' + zipCode
+        itemDicts  = memcache.get(zipCode)
 
-            result = urlfetch.fetch(requestURL)
+        if itemDicts is None:
+            itemDicts = []
 
-            if result.status_code == 200:
-                requestContents = result.content
-                itemDicts.extend(json.loads(result.content))
+            # Compile items
+            for q in queryStrings:
+                requestURL = 'http://api.smartpea.com/api/deal/?title=' + q +  '&zip=' + zipCode
 
-        # Removing duplicates and choosing a random item
-        itemDicts = [dict(tupleized) for tupleized in set(tuple(item.items()) for item in itemDicts)]
+                result = urlfetch.fetch(requestURL)
+
+                if result.status_code == 200:
+                    requestContents = result.content
+                    itemDicts.extend(json.loads(result.content))
+
+            # Removing duplicates and choosing a random item
+            itemDicts = [dict(tupleized) for tupleized in set(tuple(item.items()) for item in itemDicts)]
+            memcache.add(zipCode, itemDicts, 3600)
+
         currentItem = random.choice(itemDicts)
 
         while not self.itemHasData(currentItem, [TITLE_KEY, REGULAR_PRICE_KEY, SAVINGS_KEY]):
             currentItem = random.choice(itemDicts)
+
 
         itemTitle = self.unicodeToString(currentItem[TITLE_KEY])
         itemRegPrice = self.makePrice(self.unicodeToString(currentItem[REGULAR_PRICE_KEY]))
