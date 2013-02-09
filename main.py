@@ -18,9 +18,9 @@ class MainPage(webapp.RequestHandler):
         SAVINGS_KEY = 'Savings'
         RETAILER_KEY = 'BrandName'
 
-        images = {"steak":["http://0.static.wix.com/media/01c68a_730785e499ab4ce8c43e26ab335a876b.jpg_1024","http://www.freegreatpicture.com/files/104/30944-meat.jpg","http://prairiemeats.ca/wp-content/uploads/2011/11/F-sirloinSteak19666927.jpg"], 
-        "beef":["http://www.freegreatpicture.com/files/104/30959-meat.jpg","http://postsfreshmeatsanddeli.com/ESW/Images/hb.jpg?9569","http://www.pitch.com/binary/0dc0/1360166959-ground_beef.jpg","http://1.bp.blogspot.com/-X6MPY0HXA0k/TpfKCyiwxwI/AAAAAAAAARA/5rnsEf4ByTA/s1600/11554minced_meat.jpg"], 
-        "pork":["http://www.amigosfoods.biz/wp-content/uploads/2011/04/pork.jpg","https://www.johndavidsons.com/wp-content/uploads/2012/07/Scottish-Pork-Sirloin-Steaks-Raw1.jpg","http://www.goodhousekeeping.com/cm/goodhousekeeping/images/WZ/1011-pork-lgn.jpg"] }
+        images = {'beef': ["http://www.photographybysolaria.com/photoblog/wp-content/uploads/2012/04/prime_rib_roast_beef_food_photography-05.jpg", "http://sprinklejoy.files.wordpress.com/2011/11/img_5864.jpg", "http://images1.friendseat.com/2011/05/meat-raw-beef.jpg", "http://assets.nydailynews.com/polopoly_fs/1.1249821.1359411293!/img/httpImage/image.jpg_gen/derivatives/landscape_635/134129586.jpg" ], 
+        'steak': ["http://www.huwareserve.com/sites/default/files/styles/term_background/public/quarter1_0.jpg", "http://nebraskastarbeef.com/media/catalog/product/cache/1/image/9df78eab33525d08d6e5fb8d27136e95/n/a/natural-wagyu-12-oz-new-york-strip-raw.jpg", "http://nebraskastarbeef.com/media/catalog/product/cache/1/image/9df78eab33525d08d6e5fb8d27136e95/n/a/natural-wagyu-8-oz-filet-raw.jpg"],
+        'pork': ["http://www.itsfordinner.com/media/uploads/recipe/pulled-pork-oven-bbq/pulled-pork-1-raw.jpg", "http://notgoingoutlikethat.files.wordpress.com/2012/10/pork-tenderloin-raw.jpg?w=600", "http://nomnivores.files.wordpress.com/2011/09/jamestif8-3.jpg"]}
 
         phrases = [ "Wow! That's some cheap meat!", "Holy cow!", "Now THAT'S more meat for your buck!", "Elect meat for president!", 
                     "Who needs fruits and veggies?", "Adopt a meat-only diet!", "Meaterrific!" ]
@@ -71,7 +71,8 @@ class MainPage(webapp.RequestHandler):
         itemTitle = self.unicodeToString(currentItem[TITLE_KEY])
         itemRegPrice = self.makePrice(self.unicodeToString(currentItem[REGULAR_PRICE_KEY]))
         itemSavings = self.makePrice(self.unicodeToString(currentItem[SAVINGS_KEY]))
-        currentPriceFloat = float(itemRegPrice) - float(itemSavings)
+        savingsFormatted = "%.2f" % float(itemSavings[1:])
+        currentPriceFloat = float(itemRegPrice[1:]) - float(itemSavings[1:])
         itemCurrentPrice = "%.2f" % currentPriceFloat
         itemImageURL = self.imageFromTitle(itemTitle, images)
         itemRetailer = self.unicodeToString(currentItem[RETAILER_KEY])
@@ -79,7 +80,7 @@ class MainPage(webapp.RequestHandler):
         template_values = {
             'item_name': itemTitle,
             'img_url': itemImageURL,
-            'item_savings': itemSavings,
+            'item_savings': savingsFormatted,
             'item_regPrice': itemRegPrice,
             'item_currentPrice': itemCurrentPrice,
             'item_retailer': itemRetailer, 
@@ -104,8 +105,8 @@ class MainPage(webapp.RequestHandler):
         return uni.encode('ascii', 'ignore')
 
     def makePrice(self, price):
-        if price[0] == '$':
-            return price[1:]
+        if price[0] != '$':
+            return "$" + price
         else:
             return price
 
