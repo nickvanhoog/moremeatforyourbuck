@@ -2,7 +2,8 @@ from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.api import urlfetch
 from google.appengine.ext.webapp import template
-import json
+from django.utils import simplejson as json
+#import json
 import os
 import random
 
@@ -57,7 +58,8 @@ class MainPage(webapp.RequestHandler):
         itemRegPrice = self.makePrice(str(currentItem[REGULAR_PRICE_KEY]))
         itemSavings = self.makePrice(str(currentItem[SAVINGS_KEY]))
         itemCurrentPrice = itemRegPrice - itemSavings
-        ##itemImageURL = chooseImageURL(itemTitle, images)
+
+        #itemImageURL = chooseImageURL(itemTitle, images)
 
         template_values = {
             'item_name': itemTitle,
