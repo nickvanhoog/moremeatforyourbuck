@@ -14,6 +14,7 @@ class MainPage(webapp.RequestHandler):
         TITLE_KEY = 'Title'
         REGULAR_PRICE_KEY = 'RegularPrice'
         SAVINGS_KEY = 'Savings'
+        RETAILER_KEY = 'BrandName'
 
         images = {"steak":["http://0.static.wix.com/media/01c68a_730785e499ab4ce8c43e26ab335a876b.jpg_1024","http://www.freegreatpicture.com/files/104/30944-meat.jpg","http://prairiemeats.ca/wp-content/uploads/2011/11/F-sirloinSteak19666927.jpg"], 
         "beef":["http://www.freegreatpicture.com/files/104/30959-meat.jpg","http://postsfreshmeatsanddeli.com/ESW/Images/hb.jpg?9569","http://www.pitch.com/binary/0dc0/1360166959-ground_beef.jpg","http://1.bp.blogspot.com/-X6MPY0HXA0k/TpfKCyiwxwI/AAAAAAAAARA/5rnsEf4ByTA/s1600/11554minced_meat.jpg"], 
@@ -47,18 +48,30 @@ class MainPage(webapp.RequestHandler):
         itemRegPrice = self.makePrice(str(currentItem[REGULAR_PRICE_KEY]))
         itemSavings = self.makePrice(str(currentItem[SAVINGS_KEY]))
         itemCurrentPrice = itemRegPrice - itemSavings
-        #itemImageURL = chooseImageURL(itemTitle, images)
+        itemImageURL = self.imageFromTitle(itemTitle, images)
+        itemRetailer = str(currentItem[RETAILER_KEY])
 
         template_values = {
             'item_name': itemTitle,
-            'img_url': images[random.choice(images.keys())][0],
+            'img_url': itemImageURL,
             'item_savings': itemSavings,
             'item_regPrice': itemRegPrice,
-            'item_currentPrice': itemCurrentPrice
+            'item_currentPrice': itemCurrentPrice,
+            'item_retailer': itemRetailer
         }
 
         path = os.path.join(os.path.dirname(__file__), 'index.html')
         self.response.out.write(template.render(path, template_values))
+
+    def imageFromTitle(self, itemTitle, images):
+        categories = ['beef', 'steak', 'pork']
+        lowerTitle = itemTitle.lower()
+
+        for c in categories:
+            if c in lowerTitle:
+                return random.choice(images[c])
+
+        return random.choice(images[random.choice(categories)])
 
     def makePrice(self, price):
         if price[0] == '$':
