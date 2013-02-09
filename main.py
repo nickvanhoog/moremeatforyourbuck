@@ -18,11 +18,22 @@ class MainPage(webapp.RequestHandler):
         "beef":["http://www.freegreatpicture.com/files/104/30959-meat.jpg","http://postsfreshmeatsanddeli.com/ESW/Images/hb.jpg?9569","http://www.pitch.com/binary/0dc0/1360166959-ground_beef.jpg","http://1.bp.blogspot.com/-X6MPY0HXA0k/TpfKCyiwxwI/AAAAAAAAARA/5rnsEf4ByTA/s1600/11554minced_meat.jpg"], 
         "pork":["http://www.amigosfoods.biz/wp-content/uploads/2011/04/pork.jpg","https://www.johndavidsons.com/wp-content/uploads/2012/07/Scottish-Pork-Sirloin-Steaks-Raw1.jpg","http://www.goodhousekeeping.com/cm/goodhousekeeping/images/WZ/1011-pork-lgn.jpg"] }
 
-        zipFetchURL = "http://ws.geonames.org/findNearbyPostalCodesJSON?formatted=true&lat=36&lng=-79.08"
-        result = urlfetch.fetch(zipFetchURL)
+        latLongFetchURL = "http://api.hostip.info/get_json.php?ip="+self.request.remote_addr+"&position=true"
+        result = urlfetch.fetch(latLongFetchURL)
         if result.status_code == 200:
-            data = json.loads(result.content)
-            zipCode = data["postalCodes"][0]["postalCode"]
+            latLongdata = json.loads(result.content)
+            latitude = latLongdata["lat"]
+            longitude = latLongdata["lng"]
+
+
+        if latitude is not None and longitude is not None:
+            zipFetchURL = "http://ws.geonames.org/findNearbyPostalCodesJSON?formatted=true&lat="+latitude+"&lng="+longitude
+            result = urlfetch.fetch(zipFetchURL)
+            if result.status_code == 200:
+                data = json.loads(result.content)
+                zipCode = data["postalCodes"][0]["postalCode"]
+        else:
+            zipCode = "90024"
 
         itemDicts = []
 
@@ -46,14 +57,15 @@ class MainPage(webapp.RequestHandler):
         itemRegPrice = self.makePrice(str(currentItem[REGULAR_PRICE_KEY]))
         itemSavings = self.makePrice(str(currentItem[SAVINGS_KEY]))
         itemCurrentPrice = itemRegPrice - itemSavings
-        itemImageURL = chooseImageURL(itemTitle, images)
+        ##itemImageURL = chooseImageURL(itemTitle, images)
 
         template_values = {
             'item_name': itemTitle,
             'img_url': images[random.choice(images.keys())][0],
             'item_savings': itemSavings,
             'item_regPrice': itemRegPrice,
-            'item_currentPrice': itemCurrentPrice
+            'item_currentPrice': itemCurrentPrice,
+            'zip_code': zipCode
         }
 
         path = os.path.join(os.path.dirname(__file__), 'index.html')
