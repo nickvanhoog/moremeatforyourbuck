@@ -5,10 +5,10 @@
 </head>
   <body>
     <h1> {{ item_name }} </h1>
-    <h1> {{ item_savings }} </h1>   
+    <h2> It's ${{ item_currentPrice }} at {{ item_retailer }}, you're saving ${{ item_savings }}. WOW.  </h1>   
 
-    <img style="max-width:95%;border:6px groove #545565;" height="600" width="800" src="{{ img_url }}"/>
+    <img style="max-width:95%;border:6px groove #545565;" height="400" width="600" src="{{ img_url }}"/>
 
-    <h1 id="sillyphrase"> Now thats more meat for your buck near {{ zip_code }}<h1/>
+    <h1 id="sillyphrase"> {{ silly_meat_phrase }}<h1/>
   </body>
 </html>
