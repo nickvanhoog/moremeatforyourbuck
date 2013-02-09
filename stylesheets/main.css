@@ -2,11 +2,12 @@ body {
 	text-align: center;
 	font-family: 'Holtwood One SC', serif;
 	background-image: url(/images/meat.jpeg);
-	background-repeat: repeat-y;
-	background-repeat: repeat-x;
+	background-repeat: repeat;
 	background-position: center;
+	font-size: 48pt;
+	line-height: 180%;
 }
 
 #sillyphrase {
-	font-size: 56pt;
+
 }
