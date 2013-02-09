@@ -3,7 +3,6 @@ from google.appengine.ext.webapp.util import run_wsgi_app
 from google.appengine.api import urlfetch
 from google.appengine.ext.webapp import template
 from django.utils import simplejson as json
-#import json
 import os
 import random
 
@@ -20,11 +19,22 @@ class MainPage(webapp.RequestHandler):
         "beef":["http://www.freegreatpicture.com/files/104/30959-meat.jpg","http://postsfreshmeatsanddeli.com/ESW/Images/hb.jpg?9569","http://www.pitch.com/binary/0dc0/1360166959-ground_beef.jpg","http://1.bp.blogspot.com/-X6MPY0HXA0k/TpfKCyiwxwI/AAAAAAAAARA/5rnsEf4ByTA/s1600/11554minced_meat.jpg"], 
         "pork":["http://www.amigosfoods.biz/wp-content/uploads/2011/04/pork.jpg","https://www.johndavidsons.com/wp-content/uploads/2012/07/Scottish-Pork-Sirloin-Steaks-Raw1.jpg","http://www.goodhousekeeping.com/cm/goodhousekeeping/images/WZ/1011-pork-lgn.jpg"] }
 
-        zipFetchURL = "http://ws.geonames.org/findNearbyPostalCodesJSON?formatted=true&lat=36&lng=-79.08"
-        result = urlfetch.fetch(zipFetchURL)
+        latLongFetchURL = "http://api.hostip.info/get_json.php?ip="+self.request.remote_addr+"&position=true"
+        result = urlfetch.fetch(latLongFetchURL)
         if result.status_code == 200:
-            data = json.loads(result.content)
-            zipCode = data["postalCodes"][0]["postalCode"]
+            latLongdata = json.loads(result.content)
+            latitude = latLongdata["lat"]
+            longitude = latLongdata["lng"]
+
+
+        if latitude is not None and longitude is not None:
+            zipFetchURL = "http://ws.geonames.org/findNearbyPostalCodesJSON?formatted=true&lat="+latitude+"&lng="+longitude
+            result = urlfetch.fetch(zipFetchURL)
+            if result.status_code == 200:
+                data = json.loads(result.content)
+                zipCode = data["postalCodes"][0]["postalCode"]
+        else:
+            zipCode = "90024"
 
         itemDicts = []
 
@@ -38,6 +48,7 @@ class MainPage(webapp.RequestHandler):
                 requestContents = result.content
                 itemDicts.extend(json.loads(result.content))
 
+        # Removing duplicates and choosing a random item
         itemDicts = [dict(tupleized) for tupleized in set(tuple(item.items()) for item in itemDicts)]
         currentItem = random.choice(itemDicts)
 
@@ -58,6 +69,7 @@ class MainPage(webapp.RequestHandler):
             'item_regPrice': itemRegPrice,
             'item_currentPrice': itemCurrentPrice,
             'item_retailer': itemRetailer
+            'zip_code': zipCode
         }
 
         path = os.path.join(os.path.dirname(__file__), 'index.html')
