@@ -62,7 +62,8 @@ class MainPage(webapp.RequestHandler):
         itemTitle = self.unicodeToString(currentItem[TITLE_KEY])
         itemRegPrice = self.makePrice(self.unicodeToString(currentItem[REGULAR_PRICE_KEY]))
         itemSavings = self.makePrice(self.unicodeToString(currentItem[SAVINGS_KEY]))
-        itemCurrentPrice = itemRegPrice - itemSavings
+        currentPriceFloat = float(itemRegPrice) - float(itemSavings)
+        itemCurrentPrice = "%.2f" % currentPriceFloat
         itemImageURL = self.imageFromTitle(itemTitle, images)
         itemRetailer = self.unicodeToString(currentItem[RETAILER_KEY])
 
@@ -95,9 +96,9 @@ class MainPage(webapp.RequestHandler):
 
     def makePrice(self, price):
         if price[0] == '$':
-            return float(price[1:])
+            return price[1:]
         else:
-            return float(price)
+            return price
 
     def itemHasData(self, item, keysToCheck):
         for key in keysToCheck:
