@@ -68,7 +68,7 @@ class MainPage(webapp.RequestHandler):
             'item_savings': itemSavings,
             'item_regPrice': itemRegPrice,
             'item_currentPrice': itemCurrentPrice,
-            'item_retailer': itemRetailer
+            'item_retailer': itemRetailer, 
             'zip_code': zipCode
         }
 
