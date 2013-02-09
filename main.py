@@ -46,7 +46,7 @@ class MainPage(webapp.RequestHandler):
         itemRegPrice = self.makePrice(str(currentItem[REGULAR_PRICE_KEY]))
         itemSavings = self.makePrice(str(currentItem[SAVINGS_KEY]))
         itemCurrentPrice = itemRegPrice - itemSavings
-        itemImageURL = chooseImageURL(itemTitle, images)
+        #itemImageURL = chooseImageURL(itemTitle, images)
 
         template_values = {
             'item_name': itemTitle,
