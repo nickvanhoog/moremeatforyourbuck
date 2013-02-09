@@ -12,7 +12,7 @@ import unicodedata
 class MainPage(webapp.RequestHandler):
     def get(self):
         self.response.headers['Content-Type'] = 'text/html'
-        foodQueryStrings = ['beef', 'pork', 'steak']
+        foodQueryStrings = ['steak', 'pork', 'beef']
         TITLE_KEY = 'Title'
         REGULAR_PRICE_KEY = 'RegularPrice'
         SAVINGS_KEY = 'Savings'
