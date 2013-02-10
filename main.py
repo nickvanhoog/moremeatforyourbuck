@@ -62,7 +62,7 @@ class MainPage(webapp.RequestHandler):
 
             # Remove duplicates and store in memcache
             itemDicts = [dict(tupleized) for tupleized in set(tuple(item.items()) for item in itemDicts)]
-            memcache.add(zipCode, itemDicts, 3600)
+            memcache.add(zipCode, itemDicts, 86400)
 
         # Pick a random item and make sure it has the necessary fields
         currentItem = random.choice(itemDicts)
